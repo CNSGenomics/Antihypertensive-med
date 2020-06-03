@@ -1,0 +1,311 @@
+---
+title: "SMR_GSMR"
+author: "Solal Chauquet"
+date: "01/06/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#SMR result for blood eQTL:
+
+```{bash Run SMR for blood eQTL, eval =F}
+CHRS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22")
+for chr in ${CHRS[@]}
+do
+#Schizophrenia
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_clozuk_pgc_meta_scz --beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download --peqtl-smr 1 --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/SCZ_chr${chr} --thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G scz_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Bipolar disorder
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_bip_2018 --beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/BIP_chr${chr} --thread-num 5 --peqtl-smr 1 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G bip_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Systolic blood pressure
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_SBP_2018_Evangelou --beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download --peqtl-smr 1 --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/SBP_chr${chr} --thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G sbp_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Major Depressive Disorder
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_MDD_daner_howard2019 --beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download --peqtl-smr 1 --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/MDD_chr${chr} --thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G mdd_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+done
+```
+
+#SMR replication in Brain eQTL:
+
+```{bash Replication in the brain SMR psyencode, eval=F}
+CHRS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22")
+for chr in ${CHRS[@]}
+do
+#Schizophrenia
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_clozuk_pgc_meta_scz --beqtl-summary /home/s4513714/Q0286/uqschauquet/psyencode/PsychENCODE_cis_eqtl_PEER50_summary/DER-08a_hg19_eQTL.significant --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/PsyENCODE/SCZ_chr${chr} --thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G scz_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Bipolar disorder
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_bip_2018 --beqtl-summary /home/s4513714/Q0286/uqschauquet/psyencode/PsychENCODE_cis_eqtl_PEER50_summary/DER-08a_hg19_eQTL.significant --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/PsyENCODE/BIP_chr${chr} --thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G bip_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Systolic blood pressure
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_SBP_2018_Evangelou --beqtl-summary /home/s4513714/Q0286/uqschauquet/psyencode/PsychENCODE_cis_eqtl_PEER50_summary/DER-08a_hg19_eQTL.significant --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/PsyENCODE/SBP_chr${chr} --thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G sbp_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Major Depressive Disorder
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_MDD_daner_howard2019 --beqtl-summary /home/s4513714/Q0286/uqschauquet/psyencode/PsychENCODE_cis_eqtl_PEER50_summary/DER-08a_hg19_eQTL.significant --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/PsyENCODE/MDD_chr${chr} --thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G mdd_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+done 
+
+#ACE Schizophrenia Locus plot
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr17_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_clozuk_pgc_meta_scz --beqtl-summary /home/s4513714/Q0286/uqschauquet/psyencode/PsychENCODE_cis_eqtl_PEER50_summary/DER-08a_hg19_eQTL.significant --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/PsyENCODE/SCZ_ace_PsyEncode --thread-num 5 --diff-freq 1.000000 --plot --probe ENSG00000159640 --probe-wind 500 --gene-list /home/s4513714/s4513714/ras_ad/dataset/ref/genelist-hg19" 5 50G ace_plt 01:00:00 "-acct=UQ-IMB-CNSG"
+```
+
+```{bash Replication in the brain SMR GTExV8 Meta, eval=F}
+CHRS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22")
+for chr in ${CHRS[@]}
+do
+#Schizophrenia
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_clozuk_pgc_meta_scz --beqtl-summary /home/s4513714/Q0286/uqschauquet/V8Meta/GTExV8_Brain_Meta_1.0.3 --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/GTExV8/hg19/meta/SCZ_chr${chr} --thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G scz_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Bipolar disorder
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_bip_2018 --beqtl-summary /home/s4513714/Q0286/uqschauquet/V8Meta/GTExV8_Brain_Meta_1.0.3 --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/GTExV8/hg19/meta/BIP_chr${chr} --thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G bip_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Systolic blood pressure
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_SBP_2018_Evangelou --beqtl-summary /home/s4513714/Q0286/uqschauquet/V8Meta/GTExV8_Brain_Meta_1.0.3 --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/GTExV8/hg19/meta/SBP_chr${chr} --thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G sbp_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Major Depressive Disorder
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_MDD_daner_howard2019 --beqtl-summary /home/s4513714/Q0286/uqschauquet/V8Meta/GTExV8_Brain_Meta_1.0.3 --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/GTExV8/hg19/meta/MDD_chr${chr} --thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G mdd_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+done 
+
+#ACE Schizophrenia Locus plot
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr17_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_clozuk_pgc_meta_scz --beqtl-summary /home/s4513714/Q0286/uqschauquet/psyencode/PsychENCODE_cis_eqtl_PEER50_summary/DER-08a_hg19_eQTL.significant --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/PsyENCODE/SCZ_ace_PsyEncode --thread-num 5 --diff-freq 1.000000 --plot --probe ENSG00000159640 --probe-wind 500 --gene-list /home/s4513714/s4513714/ras_ad/dataset/ref/genelist-hg19" 5 50G ace_plt 01:00:00 "-acct=UQ-IMB-CNSG"
+```
+
+#SMR use of the rs4343 SNP:
+
+```{bash rs4343 SMR analysis, eval=F}
+CHRS=("17")
+for chr in ${CHRS[@]}
+do
+#Schizophrenia
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_clozuk_pgc_meta_scz --beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download --peqtl-smr 1 --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/rs4343/SCZ_chr${chr} --thread-num 5 --cis-wind 2000 kb --target-snp rs4343 --diff-freq 1.000000" 5 50G scz_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Bipolar disorder
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_bip_2018 --beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/rs4343/BIP_chr${chr} --thread-num 5 --peqtl-smr 1 --cis-wind 2000 kb --target-snp rs4343 --diff-freq 1.000000" 5 50G bip_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Systolic blood pressure
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_SBP_2018_Evangelou --beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download --peqtl-smr 1 --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/rs4343/SBP_chr${chr} --thread-num 5 --cis-wind 2000 kb --target-snp rs4343 --diff-freq 1.000000" 5 50G sbp_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Major Depressive Disorder
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_MDD_daner_howard2019 --beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download --peqtl-smr 1 --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/rs4343/MDD_chr${chr} --thread-num 5 --cis-wind 2000 kb --target-snp rs4343 --diff-freq 1.000000" 5 50G mdd_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+done 
+```
+
+#SMR analysis in European and East Asian descent:
+
+```{bash europrean schizophrenia, eval=F}
+CHRS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22")
+for chr in ${CHRS[@]}
+do
+#eQTLGEN
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_scz_daner_natgen_pgc_eur --beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/scz_european/SCZ_eQTLgen_chr${chr} --thread-num 5 --peqtl-smr 1 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G scz_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+#Psyencode
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_scz_daner_natgen_pgc_eur --beqtl-summary /home/s4513714/Q0286/uqschauquet/psyencode/PsychENCODE_cis_eqtl_PEER50_summary/DER-08a_hg19_eQTL.significant --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/scz_european/SCZ_PsyEncode_chr${chr} --thread-num 5 --peqtl-smr 1 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G bip_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+done
+
+#ACE Schizophrenia Locus plot
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr17_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_scz_daner_natgen_pgc_eur --beqtl-summary /home/s4513714/Q0286/uqschauquet/psyencode/PsychENCODE_cis_eqtl_PEER50_summary/DER-08a_hg19_eQTL.significant --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/scz_european/SCZ_PsyEncode_chr17 --thread-num 5 --diff-freq 1.000000 --plot --probe ENSG00000159640 --probe-wind 500 --gene-list /home/s4513714/s4513714/ras_ad/dataset/ref/genelist-hg19" 5 50G ace_plt_psy 01:00:00 "-acct=UQ-IMB-CNSG"
+
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr17_v3_impQC_10k_mac1 --gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_scz_daner_natgen_pgc_eur --beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download --out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/scz_european/SCZ_eQTLgen_chr17 --thread-num 5 --diff-freq 1.000000 --plot --probe ENSG00000159640 --probe-wind 500 --gene-list /home/s4513714/s4513714/ras_ad/dataset/ref/genelist-hg19" 5 50G ace_plt_gen 01:00:00 "-acct=UQ-IMB-CNSG"
+```
+
+```{bash, Schizophrenia Asian descent}
+CHRS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22")
+for chr in ${CHRS[@]}
+do
+###Schizophrenia Asian Descent:
+#eQLTGEN
+qsubcom "smr --bfile /QRISdata/Q0286/UKBiobank/new_ancestry_calls_2019/1kg_imputed_genotypes/QCd/EAS/UKB3_EAS_1kg_phase3_${chr}_mac1_hwe1e-6_geno0.05_mind0.1_info03_update \
+--gwas-summary /QRISdata/Q0286/sonia/published_gwas/gcta_formatted/formatted_daner_natgen_pgc_eas \
+--beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/scz_eas/16-03/SCZ_eQTLgen_chr${chr} \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G scz_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+CHRS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22")
+for chr in ${CHRS[@]}
+do
+#psyENCODE
+qsubcom "smr --bfile /QRISdata/Q0286/UKBiobank/new_ancestry_calls_2019/1kg_imputed_genotypes/QCd/EAS/UKB3_EAS_1kg_phase3_${chr}_mac1_hwe1e-6_geno0.05_mind0.1_info03_update \
+--gwas-summary /QRISdata/Q0286/sonia/published_gwas/gcta_formatted/formatted_daner_natgen_pgc_eas \
+--beqtl-summary /home/s4513714/Q0286/uqschauquet/psyencode/PsychENCODE_cis_eqtl_PEER50_summary/DER-08a_hg19_eQTL.significant \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/scz_eas/16-03/SCZ_psyENCODE_chr_${chr} \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G scz_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+done
+```
+
+#SMR analysis in csf and plasma:
+
+```{bash ACE csf, eval=F}
+CHRS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22")
+for chr in ${CHRS[@]}
+do
+###Schizophrenia:
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 \
+--gwas-summary /QRISdata/Q0286/sonia/published_gwas/gcta_formatted/formatted_ACE_CSF_GWAS \
+--beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/ACE_csf/SCZ_chr${chr} \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G scz_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+done
+```
+
+```{bash ace plasma-csf, eval=F}
+CHRS=("17")
+for chr in ${CHRS[@]}
+do
+# Exposure: blood eqtl; 
+# Outcome: plasma ACE
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 \
+--gwas-summary /home/s4513714/Q0286/uqschauquet/datasets/ACE_plasma_GWAS_full_summary_gcta_formatted.txt \
+--beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/ACE_csf/ACE_plasma_eqtlgen \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G sbp_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+
+# Exposure: blood eqtl
+# Outcome CSF ACE
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 \
+--gwas-summary /home/s4513714/Q0286/uqschauquet/datasets/ACE_CSF_GWAS_full_summary_gcta_formatted.txt \
+--beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/ACE_csf/ACE_csf_eqtlgen \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G sbp_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+done
+
+
+
+# Exposure plasma ACE - 
+# Outcome Psych Disorder
+CHRS=("17")
+
+for chr in ${CHRS[@]}
+do
+#scz
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 \
+--gwas-summary /QRISdata/Q0286/sonia/published_gwas/gcta_formatted/formatted_clozuk_pgc_meta_scz \
+--beqtl-summary /QRISdata/Q0286/uqschauquet/datasets/ACE_plasma_eQTL \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/ACE_csf/ACE_plasma_scz \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G sbp_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+#bip
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 \
+--gwas-summary /QRISdata/Q0286/sonia/published_gwas/gcta_formatted/formatted_bip_2018 \
+--beqtl-summary /QRISdata/Q0286/uqschauquet/datasets/ACE_plasma_eQTL \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/ACE_csf/ACE_plasma_bip \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G sbp_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+#mdd
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 \
+--gwas-summary  /QRISdata/Q0286/sonia/published_gwas/gcta_formatted/formatted_MDD_daner_howard2019 \
+--beqtl-summary /QRISdata/Q0286/uqschauquet/datasets/ACE_plasma_eQTL \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/ACE_csf/ACE_plasma_mdd \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G sbp_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+done
+
+# Exposure CSF ACE 
+# Outcome psych disorders
+
+CHRS=("17")
+for chr in ${CHRS[@]}
+do
+#scz
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 \
+--gwas-summary /QRISdata/Q0286/sonia/published_gwas/gcta_formatted/formatted_clozuk_pgc_meta_scz \
+--beqtl-summary /QRISdata/Q0286/uqschauquet/datasets/ACE_csf_eQTL \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/ACE_csf/ACE_csf_scz \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G scz_plasma 01:00:00 "-acct=UQ-IMB-CNSG"
+#bip
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 \
+--gwas-summary /QRISdata/Q0286/sonia/published_gwas/gcta_formatted/formatted_bip_2018 \
+--beqtl-summary /QRISdata/Q0286/uqschauquet/datasets/ACE_csf_eQTL \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/ACE_csf/ACE_csf_bip \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G bip_plasma 01:00:00 "-acct=UQ-IMB-CNSG"
+#mdd
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 \
+--gwas-summary  /QRISdata/Q0286/sonia/published_gwas/gcta_formatted/formatted_MDD_daner_howard2019 \
+--beqtl-summary /QRISdata/Q0286/uqschauquet/datasets/ACE_csf_eQTL \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/ACE_csf/ACE_csf_mdd \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G mdd_plasma 01:00:00 "-acct=UQ-IMB-CNSG"
+done
+```
+
+#SMR analysis using pQTL datasets:
+
+```{bash pQTL analysis blood pressure}
+CHRS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22")
+for chr in ${CHRS[@]}
+do
+###SBP Evangelou:
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr${chr}_v3_impQC_10k_mac1 \
+--gwas-summary /QRISdata/Q0286/sonia/published_gwas/gcta_formatted/formatted_SBP_2018_Evangelou \
+--beqtl-summary /home/s4513714/s4513714/ras_ad/dataset/formatted/pQTL/pQTL_3KProt_sparse \
+--peqtl-smr 1 \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/pQTL/SBP_Evangelou_chr_${chr} \
+--thread-num 5 --cis-wind 2000 kb --diff-freq 1.000000" 5 50G scz_${chr} 01:00:00 "-acct=UQ-IMB-CNSG"
+done
+```
+
+#Smr Locus plot:
+
+```{bash locus plot, eval=F}
+#ACE
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr17_v3_impQC_10k_mac1 \
+--gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_clozuk_pgc_meta_scz \
+--beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/scz_ACE_locus_plt_20k \
+--thread-num 10 --peqtl-smr 1 --diff-freq 1 \
+--plot --probe ENSG00000159640 --probe-wind 200 --gene-list /home/s4513714/s4513714/ras_ad/dataset/ref/genelist-hg19" 5 50G ace_locus 00:30:00 "-acct=UQ-IMB-CNSG"
+
+#NISCH
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr3_v3_impQC_10k_mac1 \
+--gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_clozuk_pgc_meta_scz \
+--beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/scz_NISCH_locus_plt_20k \
+--thread-num 10 --peqtl-smr 1 --diff-freq 1 \
+--plot --probe ENSG00000010322 --probe-wind 200 --gene-list /home/s4513714/s4513714/ras_ad/dataset/ref/genelist-hg19" 5 50G nisch_locus 00:30:00 "-acct=UQ-IMB-CNSG"
+
+#CYP17A1
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr10_v3_impQC_10k_mac1 \
+--gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_clozuk_pgc_meta_scz \
+--beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/scz_CYP17A1_locus_plt_20k \
+--thread-num 10 --peqtl-smr 1 --diff-freq 1 \
+--plot --probe ENSG00000148795 --probe-wind 200 --gene-list /home/s4513714/s4513714/ras_ad/dataset/ref/genelist-hg19" 5 50G cyp_locus 00:30:00 "-acct=UQ-IMB-CNSG"
+
+
+### BIPOLAR DISORDER ###
+
+#NISCH
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr3_v3_impQC_10k_mac1 \
+--gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_bip_2018 \
+--beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/bip_NISCH_locus_plt_20k \
+--thread-num 10 --peqtl-smr 1 --diff-freq 1 \
+--plot --probe ENSG00000010322 --probe-wind 200 --gene-list /home/s4513714/s4513714/ras_ad/dataset/ref/genelist-hg19" 5 50G nisch_locus 00:30:00 "-acct=UQ-IMB-CNSG"
+
+#CYP17A1
+qsubcom "smr --bfile /30days/GROUPS/cnsg_park/huanwei.wang/reference/UKB_10K_LD/ukbEURu_imp_chr10_v3_impQC_10k_mac1 \
+--gwas-summary /90days/uqsshah2/published_gwas/gcta_formatted/formatted_bip_2018 \
+--beqtl-summary /QRISdata/Q0286/uqtqi2/eQTLGen/eQTLGen_Download \
+--out /home/s4513714/s4513714/ras_ad/analysis/smr/psychiatricD/Updated_Blood_eQTL/bip_CYP17A1_locus_plt_20k \
+--thread-num 10 --peqtl-smr 1 --diff-freq 1 \
+--plot --probe ENSG00000148795 --probe-wind 200 --gene-list /home/s4513714/s4513714/ras_ad/dataset/ref/genelist-hg19" 5 50G cyp_locus 00:30:00 "-acct=UQ-IMB-CNSG"
+```
+
+#GSMR analysis:
+
+```{bash, eval = FALSE}
+gcta64 --mbfile /home/s4513714/s4513714/ras_ad/dataset/ref/UKbioB_imp_10k_path \
+--gsmr-file /home/s4513714/s4513714/ras_ad/dataset/ref/GSMR_Exposure /home/s4513714/s4513714/ras_ad/dataset/ref/psychiatric_D_path \
+--gsmr-direction 2 --out /home/s4513714/s4513714/ras_ad/analysis/gsmr/psychiatric_01_06_20 \
+--effect-plot --diff-freq 1 --heidi-thresh
+```

@@ -1,0 +1,238 @@
+---
+title: "DataFormating"
+author: "Solal Chauquet"
+date: "01/06/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Daner et al. Major Depressive Disorder
+Genome-wide association analyses identify 44 risk variants and refine the genetic architecture of
+major depression. Nature Genetics, 2018. 
+*75,607 cases 
+*231,747 controls 
+
+```{r, eval = F}
+MDD = read_tsv('/Users/s.chauquet/Documents/Datasets/daner_howard2019.gz')
+MDDf = MDD %>%
+  mutate(N= Nca+Nco) %>%
+  mutate(b= log(OR)) %>%
+  select(SNP, A1, A2, FRQ_A_248747, b, SE, P, N)
+colnames(MDDf) = c('SNP', 'A1', 'A2', 'freq', 'b', 'SE', 'p', 'N')
+idx= (duplicated(MDDf$SNP))
+MDDf = MDDf[-idx,]
+#Some SNPs name are NA, we will remove those rows.
+idx = idx= which(is.na(MDDf$SNP) ==T)
+MDDf = MDDf[-idx,]
+write.table(MDDf, file = '/Users/s.chauquet/Documents/Datasets/formatted_MDD_daner_howard2019.txt', quote = F, row.name = F)
+```
+
+##Evangelou et al. Systolic blood pressure.
+Genetic Analysis of Over 1 Million People Identifies 535 New Loci Associated With Blood Pressure Traits
+*757,601 participants
+
+```{r , eval = F}
+#Format the SBP dataset to use annovar next
+SBP = read_delim('/Users/s.chauquet/Documents/Datasets/UKB-ICBPmeta750k_SBPsummaryResults.txt', delim= ' ')
+SBPf = SBP %>%
+  mutate(pos = sub(x=sub(x = MarkerName, pattern =':SNP', replacement = ''), pattern = '^[0-9]+:', replacement = ''),
+         chr = sub(x=sub(x = MarkerName, pattern =':SNP', replacement = ''), pattern = ':[0-9]*$', replacement = ''),
+         Allele1 = toupper(Allele1),
+         Allele2 = toupper(Allele2))
+
+SBPf = SBPf %>%
+  mutate(pos2 = pos) %>%
+  select(chr, pos, pos2, Allele1, Allele2, Freq1, Effect, StdErr, P, N_effective)
+SBPf$pos = as.numeric(SBPf$pos)
+SBPf$pos2 = as.numeric(SBPf$pos2)
+SBPf$chr = as.numeric(SBPf$chr)
+write.table(SBP, '/Users/s.chauquet/Documents/Datasets/SBP_to_be_annot', sep = '\t', row.names = F, col.names = F, quote = F)
+
+#open the 1000genome ref
+rsid = read_tsv('/Users/s.chauquet/Documents/Datasets/1000G_phase3_20130502_all.bim', col_names = F)
+colnames(rsid) = c('chr', 'rsid', 'dunno', 'pos', 'Allele1', 'Allele2')
+
+#Map the SNPs based on the 1000genome project
+x = left_join(SBPf, rsid, by = c('chr', 'pos', 'Allele1', 'Allele2'))
+
+#open the second reference (avsnp142)
+rsid = read_tsv('/Users/s.chauquet/Documents/Datasets/SBP_to_be_annot.hg19_avsnp142_dropped', col_names = F)
+colnames(rsid) = c('useless', 'rsid', 'chr', 'pos', 'pos2', 'Allele1', 'Allele2')
+#Map the SNPs based on the avsnp142 database.
+y = left_join(x, rsid, by = c('chr', 'pos', 'Allele1', 'Allele2'))
+
+#Join the two mapping together
+y = y %>% mutate(rsid = coalesce(rsid.x, rsid.y)) %>% select(chr, pos, Allele1, Allele2, rsid)
+
+
+#open the third reference (avsnp150)
+rsid = read_tsv('/Users/s.chauquet/Documents/Datasets/SBP_to_be_annot.hg19_avsnp150_dropped', col_names = F)
+colnames(rsid) = c('useless', 'rsid', 'chr', 'pos', 'pos2', 'Allele1', 'Allele2')
+#map the snps based on the avsnp150 database
+z = left_join(y, rsid, by = c('chr', 'pos', 'Allele1', 'Allele2'))
+z = z %>% mutate(rsid = coalesce(rsid.x, rsid.y)) %>% select(chr, pos, Allele1, Allele2, rsid)
+
+
+#add the rsid to the SBP dataset.
+SBPfinal = left_join(SBPf, z, by = c('chr', 'Allele1', 'Allele2', 'pos'))
+idx = which(is.na(SBPfinal$rsid))
+#Split the SNPs mapped and unmapped
+SBPfinal_notmapped = SBPfinal[idx,]
+SBPfinal_mapped = SBPfinal[-idx,]
+#create an rsid with the following compoasition to the SNPs : 'chr:pos:allele1:allele2'
+SBPfinal_notmapped$rsid = paste(SBPfinal_notmapped$chr, SBPfinal_notmapped$pos, SBPfinal_notmapped$Allele1, SBPfinal_notmapped$Allele2, sep=':')
+#Form the final dataset.
+SBPfinal = rbind(SBPfinal_mapped, SBPfinal_notmapped)
+#remove the duplicates
+idx = duplicated(SBPfinal$rsid)
+SBPfinal = SBPfinal[-idx,]
+
+#Select only the column necessary for a gcta format.
+SBPfinal = SBPfinal %>%
+  select(rsid, Allele1, Allele2, Freq1, Effect, StdErr, P, N_effective)
+colnames(SBPfinal) = c('SNP', 'A1', 'A2', 'freq', 'b', 'SE', 'p', 'N')
+#Write the table.
+write.table(SBPfinal, '/Users/s.chauquet/Documents/Datasets/gcta_format_SBP_2018_Evangelou.txt', quote = F, row.names= F)
+
+SBP = read_delim('/Users/s.chauquet/Documents/Datasets/gcta_format_SBP_2018_Evangelou', delim = ' ')
+idx = which(duplicated(SBP$SNP))
+SBPf= SBP[-idx,]
+write.table(SBPf, '/Users/s.chauquet/Documents/Datasets/formatted_SBP_2018_Evangelou.txt', quote = F, row.names= F)
+```
+
+##Bipolar Disorder
+Genome-wide association study identifies 30 loci associated with bipolar disorder
+*20,352 cases 
+*31,358 controls
+
+```{r Bipolar Disorder 2018, eval = F}
+bip = read_tsv('/Users/s.chauquet/Documents/Datasets/Psych_09_05/daner_PGC_BIP32b_mds7a_0416a.gz')
+bipf = bip %>% 
+  select(SNP, A1,A2, FRQ_A_20352, OR, SE, P, Neff) %>%
+  mutate(b = log(OR)) %>%
+  select(SNP, A1, A2, FRQ_A_20352, b, SE, P, Neff)
+colnames(bipf) = c('SNP', 'A1', 'A2', 'freq', 'b', 'se', 'p', 'n')
+idx = duplicated(bipf$SNP)
+bipf = bipf[!idx,]
+write.table(bipf, '/Users/s.chauquet/Documents/Datasets/Psych_09_05/formatted_bip_2018.txt', quote= F, row.names = F)
+```
+
+##Schizophrenia
+Common schizophrenia alleles are enriched in mutation-intolerant genes and in regions under strong background selection
+*40,675 cases 
+*64,643 controls
+
+```{r Schizophrenia CLOZUK, eval=F}
+library(stringr)
+scz <- read_tsv('/30days/s4513714/ras_ad/dataset/raw/clozuk_pgc2.meta.sumstats.txt.gz')
+scz_f <- scz %>% select(SNP, A1, A2, Freq.A1, OR, SE, P)
+scz_f <- scz_f[str_detect(string = scz_f$SNP, pattern = 'rs'),]
+
+snp_ID <- str_split(scz_f$SNP, pattern = ':')
+snp_ID <- unlist(snp_ID)
+snp_ID <- snp_ID[str_detect(snp_ID, pattern='rs')]
+scz_f$SNP = snp_ID
+
+idx <- which(duplicated(scz_f$SNP))
+scz_f <- scz_f[-idx,]
+scz_f$n <- 64643
+scz_f$b <- log(scz_f$OR)
+scz_f <- scz_f %>% select(SNP, A1, A2, Freq.A1, b, SE, P, n)
+
+colnames(scz_f) = c('SNP', 'A1', 'A2', 'freq', 'b', 'se', 'p', 'n')
+write_tsv(sczf, '/Users/s.chauquet/Documents/Datasets/formated_schizophrenia_clozuk.txt')
+```
+
+##Schizophrenia EUR
+
+
+```{r Schizophrenia EUR, eval=F}
+scz_eur <- read_delim('/30days/s4513714/ras_ad/dataset/raw/daner_natgen_pgc_eur', delim=' ')
+scz_eur_f <- scz_eur %>% select(SNP, A1, A2, FRQ_A_33640, OR, SE, P, Neff)
+scz_eur_f$b = log(scz_eur_f$OR)
+
+idx <- which(duplicated(scz_eur_f$SNP))
+#Is equal to 0, thus not used.
+
+scz_eur_f <- scz_eur_f %>% select(SNP, A1, A2, FRQ_A_33640, b, SE, P, Neff)
+colnames(scz_eur_f) = c('SNP', 'A1', 'A2', 'freq', 'b', 'se', 'p', 'n')
+
+write_tsv(scz_eur_f, '/Users/s.chauquet/Documents/Datasets/formated_schizophrenia_european.txt')
+```
+
+##Schizophrenia EAS
+PGC EAS SCZ - Lam, Chen....Huang et al., 2019
+*22,778 cases
+*35,362 controls  
+
+```{r Schizophrenia EAS, eval=F}
+scz_eas <- read_delim('/30days/s4513714/ras_ad/dataset/raw/daner_natgen_pgc_eas', delim=' ')
+scz_eas_f <- scz_eas %>% select(SNP, A1, A2, FRQ_A_22778, OR, SE, P, Neff)
+scz_eas_f$b = log(scz_eas_f$OR)
+
+idx <- which(duplicated(scz_eas_f$SNP))
+scz_eas_f <- scz_eas_f[-idx,]
+
+scz_eas_f <- scz_eas_f %>% select(SNP, A1, A2, FRQ_A_22778, b, SE, P, Neff)
+colnames(scz_eas_f) = c('SNP', 'A1', 'A2', 'freq', 'b', 'se', 'p', 'n')
+
+write_tsv(scz_eas_f, '/Users/s.chauquet/Documents/Datasets/formated_schizophrenia_east_asian.txt')
+```
+
+##csf/plasma ACE levels:
+
+```{r, eval=F}
+library(biomaRt)
+library(data.table)
+library(tidyverse)
+
+#ACE csf
+ace_csf=fread('/home/s4513714/Q0286/uqschauquet/datasets/ACE_CSF_GWAS_full_summary_gcta_formatted.txt')
+listMarts()
+Mart <- useMart("ENSEMBL_MART_SNP")
+listDatasets(Mart)
+Mart = useDataset("hsapiens_snp",mart=Mart)
+ensembl <- useEnsembl("ENSEMBL_MART_SNP",dataset="hsapiens_snp", mirror='asia')
+rsIDs=ace_csf$SNP
+strand_information <- getBM(attributes=c('refsnp_id','refsnp_source', 'chr_name', 'chrom_start', 'chrom_end', 'chrom_strand'), 
+      filters = 'snp_filter', 
+      values = rsIDs, 
+      mart = ensembl)
+colnames(strand_information) <- c('SNP', 'SNP_source', 'Chr', 'Probe_bp', 'BP', 'Orientation')
+
+query_table <- left_join(ace_csf, strand_information, by='SNP') %>% select(SNP,Chr,BP,A1,A2,freq,Orientation,b,se,p)
+query_table$Probe='ENSG00000159640.15'
+query_table$Probe_Chr <- 17
+query_table$Gene <- 'ACE'
+query_table$Probe_bp <- 63487720
+query_table <- query_table %>% select(SNP,Chr,BP,A1,A2,freq,Probe, Probe_Chr, Probe_bp, Gene, Orientation,b,se,p)
+query_table <- query_table[!is.na(query_table$Orientation),]
+query_table <- query_table %>% mutate(Orientation =  case_when(Orientation == 1 ~ '+'))
+query_table <- query_table[!duplicated(query_table$SNP),]
+colnames(query_table)= c('SNP','Chr','BP','A1','A2','Freq','Probe','Probe_Chr','Probe_bp','Gene','Orientation','b','se','p')
+
+write_tsv(query_table, path = '/QRISdata/Q0286/uqschauquet/datasets/ACE_csf_query.txt')
+
+#ACE plasma
+ace_plasma=fread('/home/s4513714/Q0286/uqschauquet/datasets/ACE_plasma_GWAS_full_summary_gcta_formatted.txt')
+rsIDs=ace_plasma$SNP
+strand_information <- getBM(attributes=c('refsnp_id','refsnp_source', 'chr_name', 'chrom_start', 'chrom_end', 'chrom_strand'), 
+      filters = 'snp_filter', 
+      values = rsIDs, 
+      mart = ensembl)
+colnames(strand_information) <- c('SNP', 'SNP_source', 'Chr', 'Probe_bp', 'BP', 'Orientation')
+query_table <- left_join(ace_plasma, strand_information, by='SNP') %>% select(SNP,Chr,BP,A1,A2,freq,Orientation,b,se,p)
+query_table$Probe='ENSG00000159640.15'
+query_table$Probe_Chr <- 17
+query_table$Gene <- 'ACE'
+query_table$Probe_bp <- 63487720
+query_table <- query_table %>% select(SNP,Chr,BP,A1,A2,freq,Probe, Probe_Chr, Probe_bp, Gene, Orientation,b,se,p)
+query_table <- query_table[!is.na(query_table$Orientation),]
+query_table <- query_table %>% mutate(Orientation =  case_when(Orientation == 1 ~ '+'))
+query_table <- query_table[!duplicated(query_table$SNP),]
+colnames(query_table)= c('SNP','Chr','BP','A1','A2','Freq','Probe','Probe_Chr','Probe_bp','Gene','Orientation','b','se','p')
+write_tsv(query_table, path = '/QRISdata/Q0286/uqschauquet/datasets/ACE_plasma_query.txt')
+```
